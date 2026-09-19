@@ -35,16 +35,20 @@
         <h1 id="waitlist-title">Find the sample everyone else missed.</h1>
         <p class="lede">CrateSeek takes you beyond the algorithm. Shuffle through playable tracks, follow your ears and save the sounds worth returning to.</p>
 
+        <p class="waitlist-perk"><strong>Free month of Pro at launch.</strong> Everyone on the waitlist gets CrateSeek Pro free for 30 days. Sign in with Apple using this email to claim it.</p>
+
         <form
           class="waitlist-form"
           id="waitlist-form"
-          action="https://submit-form.com/PhvdbIM22"
-          method="POST">
+          method="POST"
+          novalidate>
           <label class="sr-only" for="waitlist-email">Email address</label>
           <input id="waitlist-email" name="email" type="email" autocomplete="email" inputmode="email" placeholder="Enter your email" maxlength="254" required>
           <input class="honeypot" name="website" type="text" tabindex="-1" autocomplete="off" aria-hidden="true">
           <button type="submit">Join waitlist</button>
         </form>
+        <p class="waitlist-status" id="waitlist-status" role="status" aria-live="polite"></p>
+        <noscript><p class="waitlist-status">Turn on JavaScript to join the waitlist.</p></noscript>
         <div class="waitlist-meta">
           <span>Built for curious ears.</span>
           <a href="privacy.html">Privacy</a>
@@ -62,5 +66,58 @@
       </div>
     </section>
   </main>
+
+  <script>
+    (function () {
+      var ENDPOINT = 'https://ahozvvcihjxwzoczauno.supabase.co/functions/v1/waitlist';
+      var form = document.getElementById('waitlist-form');
+      var status = document.getElementById('waitlist-status');
+      var button = form.querySelector('button');
+      var email = form.elements.email;
+
+      function show(message, isError) {
+        status.textContent = message;
+        status.classList.toggle('is-error', Boolean(isError));
+      }
+
+      form.addEventListener('submit', function (event) {
+        event.preventDefault();
+        if (!email.checkValidity()) {
+          show('Please enter a valid email address.', true);
+          email.focus();
+          return;
+        }
+        button.disabled = true;
+        show('Joining…');
+        fetch(ENDPOINT, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            email: email.value,
+            website: form.elements.website.value,
+            source: 'website'
+          })
+        })
+          .then(function (response) {
+            if (response.status === 202) {
+              form.reset();
+              show('You’re on the list. We’ll email you at launch with your free month of Pro.');
+            } else if (response.status === 429) {
+              show('Too many attempts from this network. Please try again tomorrow.', true);
+            } else if (response.status === 400) {
+              show('Please enter a valid email address.', true);
+            } else {
+              show('Something went wrong. Please try again in a moment.', true);
+            }
+          })
+          .catch(function () {
+            show('Couldn’t reach CrateSeek. Check your connection and try again.', true);
+          })
+          .then(function () {
+            button.disabled = false;
+          });
+      });
+    })();
+  </script>
 </body>
 </html>

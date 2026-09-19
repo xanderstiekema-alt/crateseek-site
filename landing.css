@@ -255,3 +255,23 @@
 @media (prefers-reduced-motion: reduce) {
   .phone { transform: none; }
 }
+
+.waitlist-perk {
+  max-width: 590px;
+  margin: -8px 0 22px;
+  color: var(--secondary);
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+.waitlist-perk strong { color: var(--text); font-weight: 700; }
+
+.waitlist-status {
+  min-height: 22px;
+  margin: 14px 0 0;
+  color: var(--text);
+  font-size: 15px;
+  font-weight: 560;
+}
+
+.waitlist-status.is-error { color: #c4302b; }
